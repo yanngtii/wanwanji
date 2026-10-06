@@ -4891,8 +4891,8 @@ async function loadChatMessages(page, chatId, options = {}) {
   const traceLowerBound = msgs[0]?.createdAt ? Number(msgs[0].createdAt) : 0
   const mcpTraces = await getMcpToolTracesForConversation('chat', chatId, traceLowerBound)
   const charName = getWechatDisplayName(char)
-  // 首屏消息已经携带 stickerImage；这里不读取整套挂载表情图片，避免大表情库拖慢聊天打开。
-  const stickerMap = {}
+  // 读取挂载的表情包分组，使 AI 回复的表情包消息能正确显示图片
+  const stickerMap = await getMountedStickerMap(chatId)
   const visibleMsgs = msgs.filter(m => parseMsgType(m.content, charName).type !== 'status-update')
   const oldestVisible = visibleMsgs[0] || null
   const hasEarlier = oldestVisible ? await hasEarlierChatMessages(chatId, oldestVisible) : false
