@@ -4568,12 +4568,20 @@ function isWanWanSendKeyEvent(event) {
 function bindWanWanMobileAction(button, handler) {
   if (!button || typeof handler !== 'function') return
   let lastTouchActionAt = 0
+  let pointerDownX = 0
+  let pointerDownY = 0
   button.addEventListener('pointerdown', event => {
     if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return
+    pointerDownX = event.clientX
+    pointerDownY = event.clientY
     try { button.setPointerCapture(event.pointerId) } catch (_) {}
   })
   button.addEventListener('pointerup', event => {
     if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return
+    const dx = event.clientX - pointerDownX
+    const dy = event.clientY - pointerDownY
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    if (dist > 8) return // 滑动超过 8px 视为滚动，忽略
     event.preventDefault()
     lastTouchActionAt = Date.now()
     handler(event)
